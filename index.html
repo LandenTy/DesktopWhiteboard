@@ -6,13 +6,13 @@
     <title>Simple Painting App</title>
     <style>
         body {
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-image: url('path/to/your/image.jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-}
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-image: url('path/to/your/image.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
 
         #canvas {
             width: 100%;
@@ -21,9 +21,10 @@
         }
 
         #tools {
-            position: absolute;
-            top: 10px;
-            left: 10px;
+            position: fixed;
+            bottom: 20px; /* Adjust as needed */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%);
             background-color: #fff;
             padding: 10px;
             border-radius: 5px;
@@ -72,6 +73,38 @@
         #size-buttons button.active {
             background-color: #eee;
         }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            width: 300px;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .modal-content button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -80,6 +113,7 @@
     <div id="tools">
         <button id="pencil">Pencil</button>
         <button id="eraser">Eraser</button>
+        <button id="clear">Clear</button>
     </div>
 
     <div id="size-buttons">
@@ -96,12 +130,24 @@
         <div style="background-color: #ff0;"></div>
     </div>
 
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <p>Are you sure you want to clear the canvas?</p>
+            <button id="confirmClear">Yes</button>
+            <button id="cancelClear">No</button>
+        </div>
+    </div>
+
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const tools = document.querySelectorAll('#tools button');
         const sizeButtons = document.querySelectorAll('#size-buttons .size-btn');
         const colors = document.querySelectorAll('#color-palette div');
+        const clearButton = document.getElementById('clear');
+        const confirmButton = document.getElementById('confirmClear');
+        const cancelButton = document.getElementById('cancelClear');
+        const modal = document.getElementById('confirmationModal');
         let isDrawing = false;
         let currentTool = 'pencil';
         let currentColor = '#000';
@@ -140,10 +186,26 @@
             });
         });
 
-        // Clear canvas
-        document.getElementById('clear').addEventListener('click', () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Event listener for clear button
+        clearButton.addEventListener('click', () => {
+            modal.style.display = 'block'; // Show modal
         });
+
+        // Event listener for confirm clear
+        confirmButton.addEventListener('click', () => {
+            clearCanvas(); // Call clear canvas function
+            modal.style.display = 'none'; // Hide modal
+        });
+
+        // Event listener for cancel clear
+        cancelButton.addEventListener('click', () => {
+            modal.style.display = 'none'; // Hide modal
+        });
+
+        // Clear canvas function
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
 
         // Drawing functions
         function startDrawing(e) {
